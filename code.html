@@ -1,0 +1,2141 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AutoCare Pro - Hệ Thống Quản Lý Gara Ô Tô (GMS)</title>
+  <!-- Google Fonts & Lucide Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --primary-light: #eff6ff;
+      --primary-gradient: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+      
+      --accent: #f59e0b;
+      --success: #10b981;
+      --success-light: #ecfdf5;
+      --danger: #ef4444;
+      --danger-light: #fef2f2;
+      --warning: #f59e0b;
+      --warning-light: #fffbeb;
+      --info: #06b6d4;
+      --info-light: #ecfeff;
+      
+      --bg-body: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-muted: #f1f5f9;
+      --border-color: #e2e8f0;
+      --border-focus: #93c5fd;
+      
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --text-subtle: #94a3b8;
+      
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.04);
+      --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.05);
+      
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 20px;
+      --radius-full: 9999px;
+      
+      --sidebar-width: 260px;
+      --header-height: 68px;
+      --transition-fast: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-normal: 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-body);
+      color: var(--text-main);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      overflow-x: hidden;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-muted);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: var(--radius-full);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    /* Layout Components */
+    .app-container {
+      display: flex;
+      width: 100%;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: var(--sidebar-width);
+      background-color: #0f172a;
+      color: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 40;
+      transition: transform var(--transition-normal);
+      box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12);
+    }
+
+    .sidebar-header {
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .brand-logo {
+      width: 40px;
+      height: 40px;
+      background: var(--primary-gradient);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+    }
+
+    .brand-logo svg {
+      width: 22px;
+      height: 22px;
+      fill: none;
+      stroke: white;
+      stroke-width: 2;
+    }
+
+    .brand-info h2 {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .brand-info span {
+      font-size: 11px;
+      color: #94a3b8;
+      display: block;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-list {
+      list-style: none;
+      padding: 20px 14px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      overflow-y: auto;
+    }
+
+    .nav-item-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border: none;
+      background: transparent;
+      color: #94a3b8;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      text-align: left;
+      transition: all var(--transition-fast);
+      position: relative;
+    }
+
+    .nav-item-btn:hover {
+      background: rgba(255, 255, 255, 0.06);
+      color: #ffffff;
+    }
+
+    .nav-item-btn.active {
+      background: var(--primary-gradient);
+      color: #ffffff;
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+    }
+
+    .nav-item-btn svg {
+      width: 20px;
+      height: 20px;
+      stroke-width: 2;
+      stroke: currentColor;
+      fill: none;
+      flex-shrink: 0;
+      transition: transform var(--transition-fast);
+    }
+
+    .nav-item-btn:hover svg {
+      transform: scale(1.1);
+    }
+
+    .badge-count {
+      margin-left: auto;
+      background: rgba(255, 255, 255, 0.16);
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: var(--radius-full);
+      font-weight: 700;
+    }
+
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    .workshop-status-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .live-dot {
+      width: 10px;
+      height: 10px;
+      background-color: var(--success);
+      border-radius: 50%;
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+      animation: pulse-ring 1.8s infinite cubic-bezier(0.4, 0, 0.6, 1);
+    }
+
+    @keyframes pulse-ring {
+      0% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.8);
+      }
+      70% {
+        box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+      }
+    }
+
+    .workshop-status-info h4 {
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+    }
+    .workshop-status-info p {
+      font-size: 11px;
+      color: #94a3b8;
+    }
+
+    /* MAIN CONTENT WRAPPER */
+    .main-wrapper {
+      flex: 1;
+      margin-left: var(--sidebar-width);
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      transition: margin-left var(--transition-normal);
+    }
+
+    /* TOPBAR */
+    .topbar {
+      height: var(--header-height);
+      background-color: var(--bg-surface);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      backdrop-filter: blur(8px);
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .menu-toggle-btn {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text-main);
+      cursor: pointer;
+      padding: 8px;
+      border-radius: var(--radius-sm);
+    }
+
+    .menu-toggle-btn:hover {
+      background: var(--bg-muted);
+    }
+
+    .page-title-area h1 {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .page-title-area p {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .btn-quick-add {
+      background: var(--primary-gradient);
+      color: white;
+      border: none;
+      padding: 9px 16px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .btn-quick-add:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-left: 12px;
+      border-left: 1px solid var(--border-color);
+    }
+
+    .avatar {
+      width: 36px;
+      height: 36px;
+      background: #e2e8f0;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: var(--primary);
+      font-size: 13px;
+      border: 2px solid white;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .user-meta {
+      line-height: 1.2;
+    }
+    .user-meta .name {
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .user-meta .role {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* CONTENT BODY & TAB SWITCHING */
+    .content-body {
+      padding: 24px 28px 48px;
+      flex: 1;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: tabFadeInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes tabFadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* CARD STYLES */
+    .card {
+      background: var(--bg-surface);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .card-header {
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-body {
+      padding: 22px;
+    }
+
+    /* METRICS GRID */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+
+    .metric-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: all var(--transition-fast);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .metric-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+      border-color: #cbd5e1;
+    }
+
+    .metric-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .metric-icon-wrap {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+
+    .metric-icon-wrap.primary { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+    .metric-icon-wrap.success { background: linear-gradient(135deg, #10b981, #047857); }
+    .metric-icon-wrap.warning { background: linear-gradient(135deg, #f59e0b, #d97706); }
+    .metric-icon-wrap.info { background: linear-gradient(135deg, #06b6d4, #0e7490); }
+
+    .metric-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .metric-badge.positive { background: var(--success-light); color: var(--success); }
+    .metric-badge.neutral { background: var(--info-light); color: var(--info); }
+
+    .metric-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .metric-value {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text-main);
+      font-feature-settings: "tnum";
+    }
+
+    .metric-sub {
+      font-size: 12px;
+      color: var(--text-subtle);
+      margin-top: 6px;
+    }
+
+    /* DASHBOARD SECTIONS GRID */
+    .dashboard-layout-grid {
+      display: grid;
+      grid-template-columns: 2fr 1.2fr;
+      gap: 22px;
+    }
+
+    /* MINI CHART CONTAINER */
+    .chart-container {
+      margin-top: 10px;
+    }
+
+    .bar-chart-mock {
+      display: flex;
+      align-items: flex-end;
+      height: 180px;
+      gap: 14px;
+      padding-top: 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .chart-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      height: 100%;
+      justify-content: flex-end;
+    }
+
+    .bar-pill {
+      width: 100%;
+      max-width: 32px;
+      background: #e2e8f0;
+      border-radius: 6px 6px 0 0;
+      transition: height 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s;
+      position: relative;
+    }
+
+    .bar-pill:hover {
+      background: var(--primary);
+    }
+
+    .bar-pill.active {
+      background: var(--primary-gradient);
+    }
+
+    .bar-pill:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #0f172a;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+      z-index: 10;
+    }
+
+    .col-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* RECENT ACTIVITY TIMELINE */
+    .activity-list {
+      list-style: none;
+      position: relative;
+    }
+
+    .activity-item {
+      display: flex;
+      gap: 14px;
+      padding-bottom: 18px;
+      position: relative;
+    }
+
+    .activity-item:not(:last-child)::before {
+      content: '';
+      position: absolute;
+      left: 15px;
+      top: 32px;
+      bottom: 0;
+      width: 2px;
+      background-color: var(--border-color);
+    }
+
+    .activity-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--primary-light);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      z-index: 2;
+    }
+
+    .activity-content h5 {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .activity-content p {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .activity-time {
+      font-size: 11px;
+      color: var(--text-subtle);
+      margin-top: 4px;
+    }
+
+    /* BADGES */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    .badge-in-progress {
+      background: #eff6ff;
+      color: #2563eb;
+      border: 1px solid #bfdbfe;
+    }
+    .badge-in-progress .badge-dot {
+      background: #2563eb;
+      animation: pulse-dot 1.4s infinite;
+    }
+
+    .badge-urgent {
+      background: #fef2f2;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+    }
+    .badge-urgent .badge-dot {
+      background: #dc2626;
+      animation: pulse-dot 1.2s infinite;
+    }
+
+    .badge-waiting {
+      background: #fffbeb;
+      color: #d97706;
+      border: 1px solid #fde68a;
+    }
+    .badge-waiting .badge-dot {
+      background: #d97706;
+    }
+
+    .badge-completed {
+      background: #ecfdf5;
+      color: #059669;
+      border: 1px solid #a7f3d0;
+    }
+    .badge-completed .badge-dot {
+      background: #059669;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.3; transform: scale(1.3); }
+    }
+
+    /* DATA TABLE */
+    .table-container {
+      overflow-x: auto;
+      border-radius: var(--radius-md);
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    .data-table th {
+      background: var(--bg-muted);
+      color: var(--text-muted);
+      font-weight: 700;
+      padding: 13px 16px;
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .data-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-main);
+      vertical-align: middle;
+    }
+
+    .data-table tbody tr {
+      transition: background-color var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .data-table tbody tr:hover {
+      background-color: #f8fafc;
+      box-shadow: inset 2px 0 0 var(--primary);
+    }
+
+    .license-plate {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      background: #1e293b;
+      color: #f8fafc;
+      padding: 4px 10px;
+      border-radius: 6px;
+      display: inline-block;
+      letter-spacing: 0.8px;
+      font-size: 12px;
+      border: 1px solid #334155;
+    }
+
+    .customer-info strong {
+      display: block;
+      color: var(--text-main);
+      font-weight: 700;
+    }
+    .customer-info span {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* SEARCH & FILTER CONTROLS */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      position: relative;
+      flex: 1;
+      min-width: 260px;
+    }
+
+    .search-box svg {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      width: 18px;
+      height: 18px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 10px 14px 10px 38px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-surface);
+      font-family: inherit;
+      font-size: 13px;
+      color: var(--text-main);
+      transition: all var(--transition-fast);
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    .filter-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-secondary {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 9px 15px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all var(--transition-fast);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-muted);
+      border-color: #cbd5e1;
+    }
+
+    /* INVENTORY STOCK PILL */
+    .stock-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+    }
+
+    .stock-pill {
+      padding: 3px 8px;
+      border-radius: var(--radius-full);
+      font-size: 11px;
+    }
+
+    .stock-good { background: var(--success-light); color: var(--success); }
+    .stock-low { background: var(--warning-light); color: var(--warning); }
+    .stock-empty { background: var(--danger-light); color: var(--danger); }
+
+    /* REPORT PROGRESS CARDS */
+    .progress-group {
+      margin-bottom: 18px;
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      font-size: 13px;
+    }
+
+    .progress-track {
+      height: 8px;
+      background: var(--bg-muted);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: var(--radius-full);
+      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .progress-fill.blue { background: var(--primary-gradient); }
+    .progress-fill.green { background: linear-gradient(135deg, #10b981, #059669); }
+    .progress-fill.orange { background: linear-gradient(135deg, #f59e0b, #d97706); }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(5px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s ease, visibility 0.25s ease;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-card {
+      background: var(--bg-surface);
+      width: 100%;
+      max-width: 520px;
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-xl);
+      border: 1px solid var(--border-color);
+      transform: scale(0.95) translateY(12px);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow: hidden;
+    }
+
+    .modal-overlay.open .modal-card {
+      transform: scale(1) translateY(0);
+    }
+
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-header h3 {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .modal-close-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 6px;
+      border-radius: var(--radius-sm);
+      display: flex;
+    }
+
+    .modal-close-btn:hover {
+      background: var(--bg-muted);
+      color: var(--text-main);
+    }
+
+    .modal-body {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .form-control {
+      padding: 10px 14px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      font-family: inherit;
+      font-size: 13px;
+      color: var(--text-main);
+      background-color: var(--bg-surface);
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border-color);
+      background: var(--bg-muted);
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    /* TOAST NOTIFICATION */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 120;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: #0f172a;
+      color: white;
+      padding: 12px 18px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: var(--shadow-xl);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transform: translateY(20px);
+      opacity: 0;
+      transition: all 0.25s ease;
+      pointer-events: auto;
+      border-left: 4px solid var(--primary);
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast.success {
+      border-left-color: var(--success);
+    }
+
+    /* BACKDROP FOR MOBILE SIDEBAR */
+    .sidebar-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 35;
+      backdrop-filter: blur(3px);
+    }
+
+    /* RESPONSIVE BREAKPOINTS */
+    @media (max-width: 1024px) {
+      .dashboard-layout-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .sidebar-backdrop.open {
+        display: block;
+      }
+
+      .main-wrapper {
+        margin-left: 0;
+      }
+
+      .menu-toggle-btn {
+        display: block;
+      }
+
+      .topbar {
+        padding: 0 16px;
+      }
+
+      .content-body {
+        padding: 16px;
+      }
+
+      .metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .user-meta {
+        display: none;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .metrics-grid {
+        grid-template-columns: 1fr;
+      }
+      .btn-quick-add span {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- App Wrapper -->
+  <div class="app-container">
+    
+    <!-- Mobile Sidebar Backdrop -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="brand-logo">
+          <svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        </div>
+        <div class="brand-info">
+          <h2>AutoCare Pro</h2>
+          <span>Hệ thống Gara 4.0</span>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <ul class="nav-list">
+        <li>
+          <button class="nav-item-btn active" data-tab="tab-dashboard">
+            <svg viewBox="0 0 24 24"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+            <span>Tổng quan</span>
+          </button>
+        </li>
+        <li>
+          <button class="nav-item-btn" data-tab="tab-reception">
+            <svg viewBox="0 0 24 24"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
+            <span>Tiếp nhận & Sửa xe</span>
+            <span class="badge-count" id="receptionBadge">5</span>
+          </button>
+        </li>
+        <li>
+          <button class="nav-item-btn" data-tab="tab-inventory">
+            <svg viewBox="0 0 24 24"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+            <span>Kho phụ tùng</span>
+          </button>
+        </li>
+        <li>
+          <button class="nav-item-btn" data-tab="tab-reports">
+            <svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+            <span>Báo cáo</span>
+          </button>
+        </li>
+      </ul>
+
+      <!-- Workshop Status Widget -->
+      <div class="sidebar-footer">
+        <div class="workshop-status-card">
+          <div class="live-dot"></div>
+          <div class="workshop-status-info">
+            <h4>Xưởng Đang Hoạt Động</h4>
+            <p>6/8 Khoang nâng đầy</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN WRAPPER -->
+    <div class="main-wrapper">
+      
+      <!-- TOPBAR -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle-btn" id="menuToggle">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+          </button>
+          <div class="page-title-area">
+            <h1 id="pageTitle">Tổng quan Garage</h1>
+            <p id="pageSub">Hôm nay, 24 Tháng 10, 2024</p>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <button class="btn-quick-add" id="openAddModalBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>Tiếp Nhận Xe Mới</span>
+          </button>
+
+          <div class="user-profile">
+            <div class="avatar">QL</div>
+            <div class="user-meta">
+              <div class="name">Nguyễn Văn Cường</div>
+              <div class="role">Quản đốc Gara</div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- CONTENT BODY -->
+      <main class="content-body">
+
+        <!-- =================== TAB 1: TỔNG QUAN =================== -->
+        <section id="tab-dashboard" class="tab-content active">
+          
+          <!-- Key Metrics -->
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <div class="metric-top">
+                <div class="metric-icon-wrap primary">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <span class="metric-badge positive">+14.2%</span>
+              </div>
+              <div class="metric-label">Doanh thu hôm nay</div>
+              <div class="metric-value">48.650.000 đ</div>
+              <div class="metric-sub">12 đơn sửa chữa đã chốt</div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-top">
+                <div class="metric-icon-wrap info">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
+                </div>
+                <span class="metric-badge neutral">Công suất 75%</span>
+              </div>
+              <div class="metric-label">Xe trong xưởng</div>
+              <div class="metric-value" id="carsInGarageMetric">18 xe</div>
+              <div class="metric-sub">6 khoang cầu nâng hoạt động</div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-top">
+                <div class="metric-icon-wrap warning">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <span class="metric-badge positive">9/12 Thợ</span>
+              </div>
+              <div class="metric-label">Thợ đang bận</div>
+              <div class="metric-value">9 Kỹ thuật viên</div>
+              <div class="metric-sub">3 thợ sẵn sàng nhận xe mới</div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-top">
+                <div class="metric-icon-wrap success">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                </div>
+                <span class="metric-badge neutral">Cần chốt giá</span>
+              </div>
+              <div class="metric-label">Xe chờ duyệt báo giá</div>
+              <div class="metric-value">4 xe</div>
+              <div class="metric-sub">Chờ khách xác nhận qua Zalo</div>
+            </div>
+          </div>
+
+          <!-- Dashboard Charts & Activity -->
+          <div class="dashboard-layout-grid">
+            
+            <!-- Revenue Performance Chart -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                  <span>Biểu đồ doanh thu 7 ngày qua</span>
+                </div>
+                <span style="font-size: 12px; color: var(--text-muted); font-weight: 600;">(Đơn vị: Triệu VNĐ)</span>
+              </div>
+              <div class="card-body">
+                <div class="bar-chart-mock">
+                  <div class="chart-col">
+                    <div class="bar-pill" style="height: 48%" data-tooltip="T2: 32 Triệu"></div>
+                    <span class="col-label">T2</span>
+                  </div>
+                  <div class="chart-col">
+                    <div class="bar-pill" style="height: 65%" data-tooltip="T3: 42 Triệu"></div>
+                    <span class="col-label">T3</span>
+                  </div>
+                  <div class="chart-col">
+                    <div class="bar-pill" style="height: 55%" data-tooltip="T4: 36 Triệu"></div>
+                    <span class="col-label">T4</span>
+                  </div>
+                  <div class="chart-col">
+                    <div class="bar-pill" style="height: 80%" data-tooltip="T5: 54 Triệu"></div>
+                    <span class="col-label">T5</span>
+                  </div>
+                  <div class="chart-col">
+                    <div class="bar-pill" style="height: 72%" data-tooltip="T6: 48 Triệu"></div>
+                    <span class="col-label">T6</span>
+                  </div>
+                  <div class="chart-col">
+                    <div class="bar-pill active" style="height: 95%" data-tooltip="T7: 64 Triệu"></div>
+                    <span class="col-label">T7</span>
+                  </div>
+                  <div class="chart-col">
+                    <div class="bar-pill" style="height: 88%" data-tooltip="CN: 58 Triệu"></div>
+                    <span class="col-label">CN</span>
+                  </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-top: 16px; font-size: 13px; color: var(--text-muted);">
+                  <span>Trung bình: <strong>47.7 Triệu / ngày</strong></span>
+                  <span style="color: var(--success); font-weight: 700;">▲ Tăng 18% so với tuần trước</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Activity Timeline -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  <span>Hoạt động gần đây</span>
+                </div>
+              </div>
+              <div class="card-body">
+                <ul class="activity-list">
+                  <li class="activity-item">
+                    <div class="activity-icon">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <div class="activity-content">
+                      <h5>Hoàn thành bảo dưỡng xe</h5>
+                      <p>Xe <strong>30H-882.19</strong> (Mazda CX-5) đã bàn giao cho anh Minh.</p>
+                      <span class="activity-time">15 phút trước • KTV Hoàng Long</span>
+                    </div>
+                  </li>
+                  <li class="activity-item">
+                    <div class="activity-icon" style="background: var(--warning-light); color: var(--warning);">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    </div>
+                    <div class="activity-content">
+                      <h5>Yêu cầu duyệt báo giá</h5>
+                      <p>Xe <strong>51K-928.33</strong> (Ford Everest) cần thay thước lái.</p>
+                      <span class="activity-time">42 phút trước • CVDV Tuấn Anh</span>
+                    </div>
+                  </li>
+                  <li class="activity-item">
+                    <div class="activity-icon" style="background: var(--info-light); color: var(--info);">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    </div>
+                    <div class="activity-content">
+                      <h5>Nhập kho phụ tùng</h5>
+                      <p>Vừa nhập 20 bộ má phanh Brembo ceramic từ NPP.</p>
+                      <span class="activity-time">2 giờ trước • Thủ kho Thanh</span>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+
+        <!-- =================== TAB 2: TIẾP NHẬN & SỬA XE =================== -->
+        <section id="tab-reception" class="tab-content">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></svg>
+                <span>Danh sách xe đang phục vụ tại xưởng</span>
+              </div>
+              <button class="btn-quick-add" id="openAddModalBtn2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <span>Tiếp nhận xe mới</span>
+              </button>
+            </div>
+            
+            <div class="card-body">
+              <div class="filter-bar">
+                <div class="search-box">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  <input type="text" class="search-input" id="receptionSearchInput" placeholder="Tìm theo biển số, tên khách hàng, dòng xe...">
+                </div>
+                <div class="filter-actions">
+                  <button class="btn-secondary" id="filterStatusAll">Tất cả xe</button>
+                  <button class="btn-secondary" id="filterStatusInProgress">Đang sửa</button>
+                  <button class="btn-secondary" id="filterStatusUrgent">Cần gấp</button>
+                </div>
+              </div>
+
+              <div class="table-container">
+                <table class="data-table" id="receptionTable">
+                  <thead>
+                    <tr>
+                      <th>Biển số xe</th>
+                      <th>Khách hàng & SĐT</th>
+                      <th>Dòng xe & Dịch vụ</th>
+                      <th>Cố vấn dịch vụ</th>
+                      <th>Trạng thái</th>
+                      <th style="text-align: right;">Hành động</th>
+                    </tr>
+                  </thead>
+                  <tbody id="receptionTableBody">
+                    <!-- Dynamic Rows will be rendered by JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- =================== TAB 3: KHO PHỤ TÙNG =================== -->
+        <section id="tab-inventory" class="tab-content">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+                <span>Danh mục linh kiện & Phụ tùng ô tô</span>
+              </div>
+              <div style="font-size: 13px; color: var(--text-muted);">
+                Tổng mục tồn kho: <strong id="totalPartsCount">8 mặt hàng</strong>
+              </div>
+            </div>
+
+            <div class="card-body">
+              <div class="filter-bar">
+                <div class="search-box">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  <input type="text" class="search-input" id="inventorySearchInput" placeholder="Tìm theo mã phụ tùng, tên linh kiện, vị trí kệ...">
+                </div>
+                <div class="filter-actions">
+                  <button class="btn-secondary" id="filterStockAll">Tất cả</button>
+                  <button class="btn-secondary" id="filterStockLow">Sắp hết hàng (&lt; 10)</button>
+                </div>
+              </div>
+
+              <div class="table-container">
+                <table class="data-table" id="inventoryTable">
+                  <thead>
+                    <tr>
+                      <th>Mã phụ tùng</th>
+                      <th>Tên linh kiện & Hãng SX</th>
+                      <th>Vị trí kệ kho</th>
+                      <th>Tồn kho</th>
+                      <th>Đơn giá xuất</th>
+                      <th>Tình trạng</th>
+                    </tr>
+                  </thead>
+                  <tbody id="inventoryTableBody">
+                    <!-- Dynamic inventory rows -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- =================== TAB 4: BÁO CÁO =================== -->
+        <section id="tab-reports" class="tab-content">
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <div class="metric-label">Tổng doanh thu tháng này</div>
+              <div class="metric-value">1.185.400.000 đ</div>
+              <div class="metric-sub">Đạt 92% chỉ tiêu tháng 10</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Lợi nhuận gộp phụ tùng</div>
+              <div class="metric-value">342.800.000 đ</div>
+              <div class="metric-sub">Biên lợi nhuận: 28.9%</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Lượt xe tiếp nhận / tháng</div>
+              <div class="metric-value">314 Lượt</div>
+              <div class="metric-sub">Bình quân 11 xe/ngày</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Tỷ lệ hài lòng khách hàng</div>
+              <div class="metric-value">98.5%</div>
+              <div class="metric-sub">Đánh giá 4.9★ trên Google Maps</div>
+            </div>
+          </div>
+
+          <div class="dashboard-layout-grid">
+            <!-- Progress bars for Service KPI -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+                  <span>Chỉ tiêu vận hành xưởng (Tháng 10/2024)</span>
+                </div>
+              </div>
+              <div class="card-body">
+                
+                <div class="progress-group">
+                  <div class="progress-header">
+                    <span style="font-weight: 600;">Chỉ tiêu doanh thu dịch vụ bảo dưỡng</span>
+                    <span style="font-weight: 700; color: var(--primary);">92% (920M / 1.000M)</span>
+                  </div>
+                  <div class="progress-track">
+                    <div class="progress-fill blue" style="width: 92%"></div>
+                  </div>
+                </div>
+
+                <div class="progress-group">
+                  <div class="progress-header">
+                    <span style="font-weight: 600;">Tỷ lệ xe hoàn thành đúng hẹn (On-time Delivery)</span>
+                    <span style="font-weight: 700; color: var(--success);">96.5%</span>
+                  </div>
+                  <div class="progress-track">
+                    <div class="progress-fill green" style="width: 96.5%"></div>
+                  </div>
+                </div>
+
+                <div class="progress-group">
+                  <div class="progress-header">
+                    <span style="font-weight: 600;">Hiệu suất khoang nâng (Lift Bay Utilization)</span>
+                    <span style="font-weight: 700; color: var(--warning);">84%</span>
+                  </div>
+                  <div class="progress-track">
+                    <div class="progress-fill orange" style="width: 84%"></div>
+                  </div>
+                </div>
+
+                <div class="progress-group">
+                  <div class="progress-header">
+                    <span style="font-weight: 600;">Tiến độ chỉ tiêu dọn nội thất & Phủ Ceramic</span>
+                    <span style="font-weight: 700; color: var(--primary);">78%</span>
+                  </div>
+                  <div class="progress-track">
+                    <div class="progress-fill blue" style="width: 78%"></div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Financial Summary Box -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+                  <span>Cơ cấu chi phí vận hành</span>
+                </div>
+              </div>
+              <div class="card-body">
+                <div style="display: flex; flex-direction: column; gap: 14px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 1px dashed var(--border-color);">
+                    <span style="font-size: 13px; color: var(--text-muted);">Giá vốn linh kiện phụ tùng</span>
+                    <strong style="font-size: 14px;">540.000.000 đ</strong>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 1px dashed var(--border-color);">
+                    <span style="font-size: 13px; color: var(--text-muted);">Lương & Hoa hồng Kỹ thuật viên</span>
+                    <strong style="font-size: 14px;">185.000.000 đ</strong>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 1px dashed var(--border-color);">
+                    <span style="font-size: 13px; color: var(--text-muted);">Mặt bằng & Điện 3 pha kho xưởng</span>
+                    <strong style="font-size: 14px;">65.000.000 đ</strong>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 1px dashed var(--border-color);">
+                    <span style="font-size: 13px; color: var(--text-muted);">Khấu hao trang thiết bị cầu nâng</span>
+                    <strong style="font-size: 14px;">22.500.000 đ</strong>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 4px;">
+                    <span style="font-size: 14px; font-weight: 800; color: var(--text-main);">Lợi nhuận ròng dự kiến</span>
+                    <strong style="font-size: 18px; color: var(--success); font-weight: 800;">+372.900.000 đ</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- =================== MODAL: THÊM XE MỚI =================== -->
+  <div class="modal-overlay" id="addCarModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Tiếp Nhận Xe Vào Xưởng</h3>
+        <button class="modal-close-btn" id="closeModalBtn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <form id="addCarForm">
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="plateInput">Biển số xe *</label>
+              <input type="text" id="plateInput" class="form-control" placeholder="VD: 30K-123.45" required>
+            </div>
+            <div class="form-group">
+              <label for="carModelInput">Dòng xe & Đời xe *</label>
+              <input type="text" id="carModelInput" class="form-control" placeholder="VD: Toyota Camry 2.5Q" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="customerNameInput">Họ tên chủ xe *</label>
+              <input type="text" id="customerNameInput" class="form-control" placeholder="VD: Trần Đình Trọng" required>
+            </div>
+            <div class="form-group">
+              <label for="customerPhoneInput">Số điện thoại liên hệ *</label>
+              <input type="tel" id="customerPhoneInput" class="form-control" placeholder="VD: 0988.123.456" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="advisorSelect">Cố vấn dịch vụ (CVDV) *</label>
+              <select id="advisorSelect" class="form-control" required>
+                <option value="Tuấn Anh">Tuấn Anh (Đội 1)</option>
+                <option value="Hải Nam">Hải Nam (Đội 2)</option>
+                <option value="Quang Dũng">Quang Dũng (Đội Sơn/Gò)</option>
+                <option value="Minh Hoàng">Minh Hoàng (Điện - Lạnh)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="statusSelect">Trạng thái xe *</label>
+              <select id="statusSelect" class="form-control" required>
+                <option value="Đang sửa">Đang sửa</option>
+                <option value="Cần gấp">Cần gấp (Ưu tiên)</option>
+                <option value="Chờ duyệt">Chờ duyệt báo giá</option>
+                <option value="Hoàn thành">Đã hoàn thành</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="servicesInput">Nội dung sửa chữa / Yêu cầu của khách</label>
+            <input type="text" id="servicesInput" class="form-control" placeholder="VD: Bảo dưỡng cấp 4 vạn, thay nhớt Castrol, kiểm tra điều hòa" required>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" id="cancelModalBtn">Hủy bỏ</button>
+          <button type="submit" class="btn-quick-add">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Lưu Tiếp Nhận</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // Initial Seed Data for Reception & Repairs
+    let receptionData = [
+      {
+        id: 1,
+        plate: '30H-882.19',
+        customer: 'Nguyễn Hoàng Minh',
+        phone: '0912.839.221',
+        car: 'Mazda CX-5 (2021)',
+        service: 'Bảo dưỡng cấp 40,000 km, thay dầu máy & lọc gió',
+        advisor: 'Tuấn Anh',
+        status: 'Đang sửa'
+      },
+      {
+        id: 2,
+        plate: '51K-928.33',
+        customer: 'Lê Thanh Thảo',
+        phone: '0983.112.990',
+        car: 'Ford Everest Titanium',
+        service: 'Kiểm tra tiếng kêu gầm trước, cân chỉnh thước lái',
+        advisor: 'Hải Nam',
+        status: 'Cần gấp'
+      },
+      {
+        id: 3,
+        plate: '29A-456.78',
+        customer: 'Phạm Quốc Hùng',
+        phone: '0904.556.789',
+        car: 'Mercedes-Benz E300 AMG',
+        service: 'Bảo dưỡng hệ thống phanh, thay 4 má phanh ceramic',
+        advisor: 'Tuấn Anh',
+        status: 'Chờ duyệt'
+      },
+      {
+        id: 4,
+        plate: '30E-712.94',
+        customer: 'Vũ Đức Thành',
+        phone: '0977.345.678',
+        car: 'Hyundai SantaFe (2020)',
+        service: 'Vệ sinh dàn lạnh nội soi, nạp gas R134a',
+        advisor: 'Minh Hoàng',
+        status: 'Đang sửa'
+      },
+      {
+        id: 5,
+        plate: '14A-633.82',
+        customer: 'Đỗ Hải Đăng',
+        phone: '0966.882.331',
+        car: 'Toyota Fortuner Legender',
+        service: 'Sơn dặm cản trước & đánh bóng toàn thân xe',
+        advisor: 'Quang Dũng',
+        status: 'Hoàn thành'
+      }
+    ];
+
+    // Initial Inventory Data
+    let inventoryData = [
+      {
+        code: 'OIL-CAST-5W30',
+        name: 'Dầu nhớt Castrol Magnatec 5W-30 (Can 4L)',
+        brand: 'Castrol (Anh Quốc)',
+        shelf: 'Kệ A1-02',
+        stock: 35,
+        price: '680.000 đ'
+      },
+      {
+        code: 'BRK-BREM-F30',
+        name: 'Bộ má phanh trước Brembo Ceramic',
+        brand: 'Brembo (Ý)',
+        shelf: 'Kệ B2-05',
+        stock: 8,
+        price: '2.450.000 đ'
+      },
+      {
+        code: 'FLT-DEN-AC01',
+        name: 'Lọc gió điều hòa than hoạt tính Denso',
+        brand: 'Denso (Nhật Bản)',
+        shelf: 'Kệ A3-11',
+        stock: 42,
+        price: '320.000 đ'
+      },
+      {
+        code: 'SPK-NGK-IRID',
+        name: 'Bugi Iridium cao cấp NGK Laser',
+        brand: 'NGK (Nhật Bản)',
+        shelf: 'Kệ C1-04',
+        stock: 60,
+        price: '260.000 đ'
+      },
+      {
+        code: 'BAT-GS-65AH',
+        name: 'Bình ắc quy khô GS MF 55D23L (65Ah)',
+        brand: 'GS Battery',
+        shelf: 'Kệ D1-01',
+        stock: 4,
+        price: '1.650.000 đ'
+      },
+      {
+        code: 'SHK-KYB-CX5',
+        name: 'Cặp giảm xóc trước KYB Excel-G (Mazda CX-5)',
+        brand: 'KYB (Nhật Bản)',
+        shelf: 'Kệ B4-08',
+        stock: 6,
+        price: '3.800.000 đ'
+      },
+      {
+        code: 'TYR-MICH-225',
+        name: 'Lốp ô tô Michelin Primacy 4 (225/55R19)',
+        brand: 'Michelin (Pháp)',
+        shelf: 'Kho Lốp Tầng 2',
+        stock: 14,
+        price: '3.950.000 đ'
+      },
+      {
+        code: 'CLT-MOT-50',
+        name: 'Nước làm mát động cơ Motul Inugel Expert 5L',
+        brand: 'Motul (Pháp)',
+        shelf: 'Kệ A2-09',
+        stock: 22,
+        price: '480.000 đ'
+      }
+    ];
+
+    // TAB TITLES MAPPING
+    const tabHeaders = {
+      'tab-dashboard': { title: 'Tổng quan Garage', sub: 'Thống kê vận hành và hiệu suất xưởng hôm nay' },
+      'tab-reception': { title: 'Tiếp nhận & Sửa xe', sub: 'Quản lý xe vào xưởng, tiến độ thi công và bàn giao' },
+      'tab-inventory': { title: 'Kho linh kiện phụ tùng', sub: 'Theo dõi tồn kho, xuất nhập vật tư và đơn giá' },
+      'tab-reports': { title: 'Báo cáo tài chính & Vận hành', sub: 'Phân tích doanh thu, chi phí và chỉ tiêu KPI' }
+    };
+
+    // DOM ELEMENTS
+    const navButtons = document.querySelectorAll('.nav-item-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    const pageTitle = document.getElementById('pageTitle');
+    const pageSub = document.getElementById('pageSub');
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+    
+    // MODAL ELEMENTS
+    const addCarModal = document.getElementById('addCarModal');
+    const openAddModalBtn = document.getElementById('openAddModalBtn');
+    const openAddModalBtn2 = document.getElementById('openAddModalBtn2');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const cancelModalBtn = document.getElementById('cancelModalBtn');
+    const addCarForm = document.getElementById('addCarForm');
+    const toastContainer = document.getElementById('toastContainer');
+    
+    // RECEPTION TABLE & SEARCH
+    const receptionTableBody = document.getElementById('receptionTableBody');
+    const receptionSearchInput = document.getElementById('receptionSearchInput');
+    const receptionBadge = document.getElementById('receptionBadge');
+    const carsInGarageMetric = document.getElementById('carsInGarageMetric');
+
+    // INVENTORY TABLE & SEARCH
+    const inventoryTableBody = document.getElementById('inventoryTableBody');
+    const inventorySearchInput = document.getElementById('inventorySearchInput');
+
+    // =================== TAB SWITCHING LOGIC ===================
+    navButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetTabId = btn.getAttribute('data-tab');
+        
+        // Remove active states
+        navButtons.forEach(b => b.classList.remove('active'));
+        tabContents.forEach(tab => tab.classList.remove('active'));
+
+        // Activate clicked tab
+        btn.classList.add('active');
+        const targetContent = document.getElementById(targetTabId);
+        if (targetContent) {
+          targetContent.classList.add('active');
+        }
+
+        // Update Header Titles
+        if (tabHeaders[targetTabId]) {
+          pageTitle.textContent = tabHeaders[targetTabId].title;
+          pageSub.textContent = tabHeaders[targetTabId].sub;
+        }
+
+        // Auto close mobile menu if opened
+        if (window.innerWidth <= 768) {
+          closeMobileSidebar();
+        }
+      });
+    });
+
+    // =================== MOBILE SIDEBAR TOGGLE ===================
+    function openMobileSidebar() {
+      sidebar.classList.add('open');
+      sidebarBackdrop.classList.add('open');
+    }
+
+    function closeMobileSidebar() {
+      sidebar.classList.remove('open');
+      sidebarBackdrop.classList.remove('open');
+    }
+
+    menuToggle.addEventListener('click', openMobileSidebar);
+    sidebarBackdrop.addEventListener('click', closeMobileSidebar);
+
+    // =================== TOAST NOTIFICATION HELPER ===================
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.innerHTML = `
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        <span>${message}</span>
+      `;
+      toastContainer.appendChild(toast);
+
+      // Trigger show
+      setTimeout(() => toast.classList.add('show'), 20);
+
+      // Auto dismiss
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 250);
+      }, 3200);
+    }
+
+    // =================== STATUS BADGE STYLING ===================
+    function getStatusBadge(status) {
+      switch (status) {
+        case 'Đang sửa':
+          return `<span class="badge badge-in-progress"><span class="badge-dot"></span>Đang sửa chữa</span>`;
+        case 'Cần gấp':
+          return `<span class="badge badge-urgent"><span class="badge-dot"></span>Cần gấp</span>`;
+        case 'Chờ duyệt':
+          return `<span class="badge badge-waiting"><span class="badge-dot"></span>Chờ duyệt</span>`;
+        case 'Hoàn thành':
+          return `<span class="badge badge-completed"><span class="badge-dot"></span>Đã hoàn thành</span>`;
+        default:
+          return `<span class="badge badge-in-progress">${status}</span>`;
+      }
+    }
+
+    // =================== RENDER RECEPTION TABLE ===================
+    function renderReceptionTable(items) {
+      receptionTableBody.innerHTML = '';
+      if (items.length === 0) {
+        receptionTableBody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align: center; padding: 32px; color: var(--text-muted);">
+              Không tìm thấy xe nào phù hợp với điều kiện tìm kiếm.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      items.forEach(car => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>
+            <span class="license-plate">${car.plate}</span>
+          </td>
+          <td>
+            <div class="customer-info">
+              <strong>${car.customer}</strong>
+              <span>${car.phone}</span>
+            </div>
+          </td>
+          <td>
+            <div style="font-weight: 600; color: var(--text-main);">${car.car}</div>
+            <div style="font-size: 11px; color: var(--text-muted);">${car.service}</div>
+          </td>
+          <td>
+            <div style="display: flex; align-items: center; gap: 6px; font-weight: 600;">
+              <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--primary);"></span>
+              ${car.advisor}
+            </div>
+          </td>
+          <td>${getStatusBadge(car.status)}</td>
+          <td style="text-align: right;">
+            <div style="display: inline-flex; gap: 6px;">
+              <button class="btn-secondary" style="padding: 6px 10px; font-size: 11px;" onclick="quickStatusChange(${car.id})">
+                Đổi trạng thái
+              </button>
+            </div>
+          </td>
+        `;
+        receptionTableBody.appendChild(tr);
+      });
+
+      // Update badge count
+      receptionBadge.textContent = receptionData.length;
+      carsInGarageMetric.textContent = `${receptionData.length} xe`;
+    }
+
+    // =================== RENDER INVENTORY TABLE ===================
+    function renderInventoryTable(items) {
+      inventoryTableBody.innerHTML = '';
+      if (items.length === 0) {
+        inventoryTableBody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align: center; padding: 32px; color: var(--text-muted);">
+              Không có phụ tùng nào khớp với từ khóa.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      items.forEach(part => {
+        let stockClass = 'stock-good';
+        let stockLabel = 'Đủ tồn kho';
+        if (part.stock === 0) {
+          stockClass = 'stock-empty';
+          stockLabel = 'Hết hàng';
+        } else if (part.stock < 10) {
+          stockClass = 'stock-low';
+          stockLabel = 'Cảnh báo sắp hết';
+        }
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>
+            <strong style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--primary);">${part.code}</strong>
+          </td>
+          <td>
+            <div style="font-weight: 700; color: var(--text-main);">${part.name}</div>
+            <div style="font-size: 11px; color: var(--text-muted);">${part.brand}</div>
+          </td>
+          <td>
+            <span style="background: var(--bg-muted); padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">
+              ${part.shelf}
+            </span>
+          </td>
+          <td>
+            <div class="stock-indicator">
+              <span style="font-size: 14px; font-weight: 800;">${part.stock}</span>
+              <span class="stock-pill ${stockClass}">${stockLabel}</span>
+            </div>
+          </td>
+          <td>
+            <strong style="font-size: 13px; color: var(--text-main);">${part.price}</strong>
+          </td>
+          <td>
+            <button class="btn-secondary" style="padding: 5px 10px; font-size: 11px;" onclick="restockPart('${part.code}')">
+              + Nhập thêm
+            </button>
+          </td>
+        `;
+        inventoryTableBody.appendChild(tr);
+      });
+    }
+
+    // =================== FILTER & SEARCH LOGIC ===================
+    // Reception search
+    receptionSearchInput.addEventListener('input', (e) => {
+      const term = e.target.value.toLowerCase().trim();
+      const filtered = receptionData.filter(car => 
+        car.plate.toLowerCase().includes(term) ||
+        car.customer.toLowerCase().includes(term) ||
+        car.car.toLowerCase().includes(term) ||
+        car.phone.includes(term)
+      );
+      renderReceptionTable(filtered);
+    });
+
+    // Reception filter buttons
+    document.getElementById('filterStatusAll').addEventListener('click', () => {
+      receptionSearchInput.value = '';
+      renderReceptionTable(receptionData);
+    });
+    document.getElementById('filterStatusInProgress').addEventListener('click', () => {
+      renderReceptionTable(receptionData.filter(c => c.status === 'Đang sửa'));
+    });
+    document.getElementById('filterStatusUrgent').addEventListener('click', () => {
+      renderReceptionTable(receptionData.filter(c => c.status === 'Cần gấp'));
+    });
+
+    // Inventory search
+    inventorySearchInput.addEventListener('input', (e) => {
+      const term = e.target.value.toLowerCase().trim();
+      const filtered = inventoryData.filter(item => 
+        item.code.toLowerCase().includes(term) ||
+        item.name.toLowerCase().includes(term) ||
+        item.brand.toLowerCase().includes(term) ||
+        item.shelf.toLowerCase().includes(term)
+      );
+      renderInventoryTable(filtered);
+    });
+
+    // Inventory filter buttons
+    document.getElementById('filterStockAll').addEventListener('click', () => {
+      inventorySearchInput.value = '';
+      renderInventoryTable(inventoryData);
+    });
+    document.getElementById('filterStockLow').addEventListener('click', () => {
+      renderInventoryTable(inventoryData.filter(item => item.stock < 10));
+    });
+
+    // =================== QUICK ACTIONS SIMULATION ===================
+    window.quickStatusChange = function(id) {
+      const car = receptionData.find(c => c.id === id);
+      if (!car) return;
+      
+      const statuses = ['Đang sửa', 'Cần gấp', 'Chờ duyệt', 'Hoàn thành'];
+      const nextIndex = (statuses.indexOf(car.status) + 1) % statuses.length;
+      car.status = statuses[nextIndex];
+      renderReceptionTable(receptionData);
+      showToast(`Đã chuyển trạng thái xe ${car.plate} sang "${car.status}"`);
+    };
+
+    window.restockPart = function(code) {
+      const item = inventoryData.find(p => p.code === code);
+      if (item) {
+        item.stock += 10;
+        renderInventoryTable(inventoryData);
+        showToast(`Đã nhập thêm +10 linh kiện [${code}]. Tồn kho mới: ${item.stock}`);
+      }
+    };
+
+    // =================== MODAL HANDLING ===================
+    function openModal() {
+      addCarModal.classList.add('open');
+      document.getElementById('plateInput').focus();
+    }
+
+    function closeModal() {
+      addCarModal.classList.remove('open');
+      addCarForm.reset();
+    }
+
+    openAddModalBtn.addEventListener('click', openModal);
+    if (openAddModalBtn2) openAddModalBtn2.addEventListener('click', openModal);
+    closeModalBtn.addEventListener('click', closeModal);
+    cancelModalBtn.addEventListener('click', closeModal);
+
+    // Close on click outside modal card
+    addCarModal.addEventListener('click', (e) => {
+      if (e.target === addCarModal) {
+        closeModal();
+      }
+    });
+
+    // Handle Form Submit
+    addCarForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const newCar = {
+        id: Date.now(),
+        plate: document.getElementById('plateInput').value.trim().toUpperCase(),
+        customer: document.getElementById('customerNameInput').value.trim(),
+        phone: document.getElementById('customerPhoneInput').value.trim(),
+        car: document.getElementById('carModelInput').value.trim(),
+        advisor: document.getElementById('advisorSelect').value,
+        status: document.getElementById('statusSelect').value,
+        service: document.getElementById('servicesInput').value.trim()
+      };
+
+      // Add to beginning of array
+      receptionData.unshift(newCar);
+      renderReceptionTable(receptionData);
+      
+      closeModal();
+      showToast(`Đã tiếp nhận thành công xe ${newCar.plate}!`, 'success');
+
+      // If user isn't on reception tab, switch to it automatically to see new car
+      const receptionBtn = document.querySelector('[data-tab="tab-reception"]');
+      if (receptionBtn && !receptionBtn.classList.contains('active')) {
+        receptionBtn.click();
+      }
+    });
+
+    // =================== INITIAL BOOT ===================
+    renderReceptionTable(receptionData);
+    renderInventoryTable(inventoryData);
+
+  </script>
+</body>
+</html>
